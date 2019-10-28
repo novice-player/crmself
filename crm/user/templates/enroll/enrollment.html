@@ -1,0 +1,91 @@
+{% extends 'customer_page/starter.html' %}
+
+{% block header %}
+    <h1>报名记录</h1>
+{% endblock %}
+
+{% block content %}
+    <div>
+        <a href="{% url 'user:enrolladd' %}" class="add btn btn-success pull-left">添加</a>
+        <div class="row">
+            <div class="col-lg-4 pull-right">
+                <form action="" method="get">
+                    <div class="col-lg-3" style="left: 32px;">
+                        <select id="search_field" class="form-control" name="search_field">
+                            <option value="customer__name">姓名</option>
+                        </select>
+                    </div>
+                    <div class="col-lg-9">
+                        <div class="input-group">
+                            <input name="kw" id="kw" type="text" class="form-control" placeholder="Search for...">
+                            <span class="input-group-btn">
+                        <button class="btn btn-default search-btn" type="submit">Go!</button>
+                    </span>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <form action="" method="post">
+            {% csrf_token %}
+            <div class="row">
+                <div class="col-xs-2">
+                    <select class="form-control" name="change_of_owner">
+                        <option value="delete">删除</option>
+
+                    </select>
+                </div>
+                <div class="col-xs-1">
+                    <button type="submit" class="btn btn-info">提交</button>
+                </div>
+
+            </div>
+            <table class="table table-bordered table-striped">
+                <thead>
+                <tr>
+                    <th>#</th>
+                    <th>序号</th>
+                    <th>客户名称</th>
+                    <th>报名日期</th>
+                    <th>校区</th>
+                    <th>所报班级</th>
+                    <th>操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for enroll_obj in enroll_objs %}
+                    <tr>
+                        <td><input type="checkbox" name="change_msg" value="{{ enroll_obj.id }}"></td>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ enroll_obj.customer.name }}</td>
+                        <td>{{ enroll_obj.enrolled_date|date:"Y-m-d" }}</td>
+                        <td>{{ enroll_obj.school.name}}</td>
+                        <td>{{ enroll_obj.enrolment_class }}</td>
+                        <td>
+                            <a href="{% url 'user:enrolledit' enroll_obj.pk %}" class="glyphicon glyphicon-pencil"></a>
+                        </td>
+                    </tr>
+                {% endfor %}
+
+                </tbody>
+            </table>
+        </form>
+        <nav aria-label="Page navigation">
+            <ul class="pagination">
+                {{ page_html|safe }}
+            </ul>
+        </nav>
+    </div>
+
+
+{% endblock %}
+
+{% block script %}
+    <script>
+        $('#search_field').val('{{ search_field|default:"customer__name" }}');
+        $('#kw').val('{{ kw|default:"" }}');
+        $('#x').click(function () {
+            location.href='{% url 'user:customer' %}'
+        })
+    </script>
+{% endblock %}

@@ -1,0 +1,24 @@
+{% extends 'customer_page/starter.html' %}
+
+{% block header %}
+    <h1>{{ header_info }}</h1>
+{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-xs-8 col-xs-offset-2">
+            <form action="" method="post">
+                {% csrf_token %}
+                {% for coursere in coursere_obj %}
+                    <label for="{{ coursere.id_for_label }}">{{ coursere.label }}</label>
+                    {{ coursere }}
+                {% endfor %}
+                <br>
+                <div class="pull-left">
+                    <button type="submit" class="btn btn-success">提交</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+{% endblock %}

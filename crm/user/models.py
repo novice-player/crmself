@@ -14,6 +14,7 @@ class UserInfo(models.Model):
     email = models.EmailField()
     state_employees = models.CharField(max_length=1,default=1)
     depart = models.ForeignKey('Department', on_delete=models.CASCADE, null=True, blank=True)
+    role = models.ManyToManyField(to='Roles',verbose_name="角色")
     def __str__(self):
         return self.username
 
@@ -226,6 +227,9 @@ class ConsultRecord(models.Model):
     date = models.DateTimeField("跟进日期", auto_now_add=True)
     delete_status = models.BooleanField(verbose_name='删除状态', default=False)
     # def __str__(self):
+    class Meta:
+        verbose_name='跟进记录表'
+        verbose_name_plural = '跟进记录表'
 
 
 
@@ -246,6 +250,8 @@ class Enrollment(models.Model):
 
     class Meta:
         unique_together = ('enrolment_class', 'customer')
+        verbose_name = '报名表'
+        verbose_name_plural = '报名表'
 
     def __str__(self):
         return self.customer.name
@@ -328,6 +334,42 @@ class StudyRecord(models.Model):
 
 
 
+class Permissions(models.Model):
+    """
+    权限
+    """
+    title = models.CharField(max_length=32)
+    url = models.CharField(max_length=45)
+    menus = models.BooleanField(default=False,verbose_name="是否为菜单")
+    icon = models.CharField(max_length=60,verbose_name="图标",null=True,blank=True)
+    menu = models.ForeignKey('Menu',blank=True,null=True)
+    parent = models.ForeignKey('self',blank=True,null=True)
+
+    def __str__(self):
+        return self.title
+
+
+class Roles(models.Model):
+    """
+    角色
+    """
+    name = models.CharField(max_length=12)
+    permissions = models.ManyToManyField(to='Permissions')
+
+    def __str__(self):
+        return self.name
+
+
+class Menu(models.Model):
+    """
+    一级菜单信息
+    """
+    title = models.CharField(max_length=32)
+    icon = models.CharField(max_length=24,null=True,blank=True)
+    weight = models.IntegerField(default=10)
+
+    def __str__(self):
+        return self.title
 
 
 
