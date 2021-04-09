@@ -20,4 +20,16 @@ urlpatterns = [
     url(r'^courserecord/add/$', views.courserecordadd,name="courserecordadd"),
     url(r'^courserecord/edit/(\d+)$', views.courserecordedit,name="courserecordedit"),
     url(r'^studyrecord/$', views.StudyRe.as_view(), name="studyrecord"),
+    url(r'^role/$', views.RoleList.as_view(), name="role"),
+    url(r'^role/add/$', views.roleadd, name="roleadd"),
+    url(r'^role/edit/(\d+)$', views.roleedit, name="roleedit"),
+    url(r'^role/del/(\d+)$', views.roledel, name="roledel"),
+    url(r'^menulist/$', views.MenuList.as_view(), name="menulist"),
+    url(r'^menulist/add/$', views.menuadd, name="menuadd"),
+    url(r'^menulist/edit/(\d+)$', views.menuedit, name="menuedit"),
+    url(r'^menulist/del/(\d+)$', views.menudel, name="menudel"),
+    url(r'^permission/del/(\d+)$', views.permissiondel, name="permissiondel"),
+    url(r'^permission/add/$', views.permissionadd, name="permissionadd"),
+    url(r'^permission/edit/(\d+)$', views.permissionedit, name="permissionedit"),
+
 ]

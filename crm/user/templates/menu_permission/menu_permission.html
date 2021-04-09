@@ -1,0 +1,108 @@
+{% extends 'customer_page/starter.html' %}
+
+{% block header %}
+    <h1>菜单权限展示</h1>
+{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-xs-3">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title"><i class="fa fa-bars"></i> 菜单管理
+                        <a href="{% url 'user:menuadd' %}"
+                           class="add btn btn-success btn-xs pull-right {{ request.session.permission_show.menuadd|default:'hidden' }}"><i
+                                class="fa fa-plus-square"></i> 添加</a>
+                    </h3>
+                </div>
+                <div class="panel-body">
+
+                    <form action="" method="post">
+                        {% csrf_token %}
+                        <table class="table table-bordered ">
+                            <thead>
+                            <tr>
+                                <th>名称</th>
+                                <th>图标</th>
+                                <th class="{{ request.session.permission_show.menuedit|default:'hidden' }}">操作</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for menus in menus_obj %}
+                                <tr>
+                                    <td>{{ menus.title }}</td>
+                                    <td><i class="{{ menus.icon }}"></i></td>
+                                    <td class="{{ request.session.permission_show.menuedit|default:'hidden' }}">
+                                        <a href="{% url 'user:menuedit' menus.pk %}"
+                                           class="glyphicon glyphicon-pencil pull-left {{ request.session.permission_show.menuedit|default:'hidden' }}"></a>
+
+                                        <a href="{% url 'user:menudel' menus.pk %}"
+                                           class="glyphicon glyphicon-trash pull-left {{ request.session.permission_show.menudel|default:'hidden' }}"></a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+
+                            </tbody>
+                        </table>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-xs-9">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title"><i class="fa fa-university"></i> 权限管理
+                        <a href="{% url 'user:permissionadd' %}"
+                           class="add btn btn-success btn-xs pull-right {{ request.session.permission_show.permissionadd|default:'hidden' }}"><i
+                                class="fa fa-plus-square"></i> 添加</a>
+                    </h3>
+                </div>
+                <div class="panel-body">
+                    <form action="" method="post">
+                        {% csrf_token %}
+                        <table class="table table-bordered">
+                            <thead>
+                            <tr>
+                                <th>名称</th>
+                                <th>URL</th>
+                                <th>URL别名</th>
+                                <th>菜单</th>
+                                <th>所属菜单</th>
+                                <th class="{{ request.session.permission_show.permissionedit|default:'hidden' }}">操作</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for permissions in permissions_obj %}
+                                <tr>
+                                    <td>{{ permissions.title }}</td>
+                                    <td>{{ permissions.url }}</td>
+                                    <td>{{ permissions.alias }}</td>
+                                    <td>{% if permissions.menus %}
+                                        是
+                                    {% endif %}</td>
+                                    <td>{{ permissions.menu.title }}</td>
+                                    <td class="{{ request.session.permission_show.permissionedit|default:'hidden' }}">
+                                        <a href="{% url 'user:permissionedit' permissions.pk %}"
+                                           class="glyphicon glyphicon-pencil pull-left {{ request.session.permission_show.permissionedit|default:'hidden' }}"></a>
+
+                                        <a href="{% url 'user:permissiondel' permissions.pk %}"
+                                           class="glyphicon glyphicon-trash pull-left {{ request.session.permission_show.permissiondel|default:'hidden' }}"></a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+
+                            </tbody>
+                        </table>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+{% endblock %}
+
+{% block script %}
+
+{% endblock %}

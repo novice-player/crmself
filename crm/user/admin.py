@@ -7,8 +7,8 @@ class UserInfoAdmin(admin.ModelAdmin):
     # list_editable = ['id','username','phone_number','email','state_employees','depart']
 
 class Permissions(admin.ModelAdmin):
-    list_display=['id','title', 'url', 'menu','parent']
-    list_editable=['title', 'url', 'menu','parent']
+    list_display=['id','title', 'url', 'menu','parent','alias']
+    list_editable=['title', 'url', 'menu','parent','alias']
 
 admin.site.register(models.UserInfo,UserInfoAdmin)
 admin.site.register(models.Department)

@@ -6,7 +6,7 @@
 
 {% block content %}
     <div>
-        <a href="{% url 'user:add' %}" class="add btn btn-success pull-left">添加</a>
+        <a href="{% url 'user:add' %}" class="add btn btn-success pull-left {{ request.session.permission_show.add|default:'hidden' }}">添加</a>
         <div class="row">
             <div class="col-lg-4 pull-right">
                 <form action="" method="get">
@@ -58,7 +58,7 @@
                     <th>销售</th>
                     <th>客户状态</th>
                     <th>跟踪记录</th>
-                    <th>操作</th>
+                    <th class="{{ request.session.permission_show.edit|default:'hidden' }}">操作</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -75,8 +75,8 @@
                         <td>{{ custobj.consultant|default:"暂无" }}</td>
                         <td>{{ custobj.get_status_display }}</td>
                         <td><a href="{% url 'user:followuprecords' %}?cname={{ custobj.name }}">记录详情</a></td>
-                        <td>
-                            <a href="{% url 'user:edit' custobj.id %}" class="glyphicon glyphicon-pencil"></a>
+                        <td class="{{ request.session.permission_show.edit|default:'hidden' }}">
+                            <a href="{% url 'user:edit' custobj.id %}" class="glyphicon glyphicon-pencil {{ request.session.permission_show.edit|default:'hidden' }}"></a>
                         </td>
                     </tr>
                 {% endfor %}

@@ -7,7 +7,7 @@ from django.urls import reverse
 from django.db.models import Q
 from django.views import View
 from urllib.parse import urlencode
-from user.formself.myform import RegForm, CustomerFrom, ConsultRecordFrom, EnrollMentFrom,CourseReFrom,StudyRecordFrom
+from user.formself.myform import RegForm, CustomerFrom, ConsultRecordFrom, EnrollMentFrom,CourseReFrom,StudyRecordFrom,RoleFrom,MenuFrom,PermissionsForm
 from django.db import transaction
 from django.forms.models import modelformset_factory
 from collections import OrderedDict
@@ -58,17 +58,25 @@ def login(request):
             # 登录成功后提取用户权限注入到session中
             user_url = ret_info.role.values('permissions__pk','permissions__url','permissions__title',
                                             'permissions__menu__pk','permissions__parent__pk','permissions__menu__title',
-                                            'permissions__menu__icon','permissions__menu__weight').distinct()
+                                            'permissions__menu__icon','permissions__menu__weight','permissions__parent_id',
+                                            'permissions__alias').distinct()
             # url列表信息
             permission_list = []
 
             # 左侧菜单信息
             menu_dict = {}
 
-            for msg in user_url:
-                permission_list.append({'url':msg["permissions__url"]})
+            # 权限展示信息
+            permission_show = {}
 
-                # 拼接数据
+            # 拼接数据
+            for msg in user_url:
+                permission_list.append({'url':msg["permissions__url"],'menu_id':msg.get('permissions__parent_id'),
+                                        'title':msg.get('permissions__title')})
+                # 拼接权限展示信息
+                permission_show[msg.get('permissions__alias')] = 'show'
+
+                # 拼接左侧菜单信息
                 if msg.get("permissions__menu__pk"):
                     if msg.get("permissions__menu__pk") in menu_dict:
                         menu_dict[msg.get('permissions__menu__pk')]['childen'].append(
@@ -103,6 +111,7 @@ def login(request):
             request.session['permissions'] = permission_list
             request.session['menu_dict'] = order_dict
             request.session["uname"] = uname
+            request.session["permission_show"] = permission_show
 
             return JsonResponse(info_msg)
         else:
@@ -299,6 +308,17 @@ def add(request):
     if request.method == "POST":
         addret = request.POST.dict()
         addret.pop("csrfmiddlewaretoken")
+
+        # introduce_obj = models.Customer.objects.filter(id=addret['introduce_from'])
+        # consultant_obj = models.UserInfo.objects.filter(id=addret['consultant'])
+        # addret['introduce_from'] = introduce_obj
+        # addret['consultant'] = consultant_obj
+        addret['introduce_from_id'] = addret['introduce_from']
+        addret['consultant_id'] = addret['consultant']
+        addret.pop('consultant')
+        addret.pop('introduce_from')
+
+        print(addret)
         models.Customer.objects.create(**addret)
         return redirect(reverse('user:customer'))
     return render(request, 'customer_page/write.html',
@@ -700,3 +720,193 @@ class StudyRe(View):
         if form_set.is_valid():
             form_set.save()
         return redirect(reverse('user:studyrecord'))
+
+
+class RoleList(View):
+    """
+    角色信息管理
+    """
+
+    def get(self, request):
+        roles_obj = models.Roles.objects.all()
+        request.session["page"] = ''
+        if request.GET.get('page'):
+            request.session["page"] = request.GET.get('page')
+        request.session["search_url"] = ''
+        page = Paging(request.GET.get("page"), roles_obj.count())
+        return render(request, 'roles/role.html',
+                      {"roles_obj": roles_obj[page.start:page.end], "page_html": page.page_html})
+
+
+def roleadd(request):
+    """
+    角色添加
+    :param request:
+    :return:
+    """
+    header_info = {"add": "角色添加", "edit": "角色修改"}
+    roles_obj = RoleFrom(request)
+    if request.method == "POST":
+        permissions_list = request.POST.getlist('permissions')
+        name = request.POST.get('name')
+
+        # 增加记录
+        role_obj = models.Roles.objects.create(name=name)
+        role_obj.permissions.add(*permissions_list)
+        return redirect(reverse('user:role'))
+    return render(request, 'roles/write.html',{"header_info": header_info['add'], "roles_obj": roles_obj})
+
+
+def roleedit(request,id):
+    """
+    角色修改
+    :param request:
+    :return:
+    """
+    header_info = {"add": "角色添加", "edit": "角色修改"}
+    role_obj = models.Roles.objects.filter(id=id).first()
+    roles_obj = RoleFrom(request, instance=role_obj)  # 不写instance是创建，写了是更新
+    if request.method == "POST":
+        roles_obj = RoleFrom(request, request.POST, instance=role_obj)
+        roles_obj.save()
+        role_url = reverse('user:role')
+
+        # 拼接URL(页码+搜索关键字)，保证返回上一次的页面
+        role_url = f"{role_url}?page={request.session.get('page')}&{request.session.get('search_url')}"
+        return redirect(role_url)
+    return render(request, 'roles/write.html',
+                  {"header_info": header_info['edit'], "roles_obj": roles_obj})
+
+
+def roledel(request,id):
+    """
+    角色删除
+    :param request:
+    :return:
+    """
+    models.Roles.objects.filter(id=id).delete()
+    return redirect('user:role')
+
+class MenuList(View):
+    """
+    菜单权限信息展示
+    """
+
+    def get(self,request):
+        menus_obj = models.Menu.objects.all()
+        permissions_obj = models.Permissions.objects.all()
+        return render(request,'menu_permission/menu_permission.html',{'menus_obj':menus_obj,'permissions_obj':permissions_obj})
+
+
+
+def menuadd(request):
+    """
+    菜单添加
+    :param request:
+    :return:
+    """
+    header_info = {"add": "菜单添加", "edit": "菜单修改"}
+    menus_obj = MenuFrom(request)
+    if request.method == "POST":
+        addret = request.POST.dict()
+        addret.pop("csrfmiddlewaretoken")
+
+        # 增加记录
+        models.Menu.objects.create(**addret)
+        return redirect(reverse('user:menulist'))
+    return render(request, 'menu_permission/menu_add_edit.html',{"header_info": header_info['add'], "menus_obj": menus_obj})
+
+def menuedit(request,id):
+    """
+    菜单修改
+    :param request:
+    :return:
+    """
+    header_info = {"add": "菜单添加", "edit": "菜单修改"}
+    menu_obj = models.Menu.objects.filter(id=id).first()
+    menus_obj = MenuFrom(request, instance=menu_obj)  # 不写instance是创建，写了是更新
+    if request.method == "POST":
+        menus_obj = MenuFrom(request, request.POST, instance=menu_obj)
+        menus_obj.save()
+        return redirect('user:menulist')
+    return render(request, 'menu_permission/menu_add_edit.html',
+                  {"header_info": header_info['edit'], "menus_obj": menus_obj})
+
+
+def menudel(request,id):
+    """
+    菜单删除
+    :param request:
+    :return:
+    """
+    models.Menu.objects.filter(id=id).delete()
+    return redirect('user:menulist')
+
+
+def permissionadd(request):
+    """
+    权限添加
+    :param request:
+    :return:
+    """
+    header_info = {"add": "权限添加", "edit": "权限修改"}
+    permissions_obj = PermissionsForm(request)
+    if request.method == "POST":
+        addret = request.POST.dict()
+        addret.pop("csrfmiddlewaretoken")
+
+        if addret['menus'] == '2':
+            addret['menus'] = True
+        else:
+            addret['menus'] = False
+
+        addret['menu'] = models.Menu.objects.filter(id=addret['menu']).first()
+        addret['parent'] = models.Permissions.objects.filter(id=addret['parent']).first()
+
+        # 增加记录
+        models.Permissions.objects.create(**addret)
+        return redirect(reverse('user:menulist'))
+    return render(request, 'menu_permission/permissions_add_edit.html',{"header_info": header_info['add'], "permissions_obj": permissions_obj})
+
+def permissionedit(request,id):
+    """
+    权限修改
+    :param request:
+    :return:
+    """
+    header_info = {"add": "权限添加", "edit": "权限修改"}
+    permission_obj = models.Permissions.objects.filter(id=id).first()
+    permissions_obj = PermissionsForm(request, instance=permission_obj)  # 不写instance是创建，写了是更新
+    if request.method == "POST":
+        # permissions_obj = PermissionsForm(request, request.POST, instance=permission_obj)
+        # if permissions_obj.is_valid():
+        #     permissions_obj.save()
+        # else:
+        #     return HttpResponse('数据错误')
+        addret = request.POST.dict()
+        addret.pop("csrfmiddlewaretoken")
+
+        if addret['menus'] == '2':
+            addret['menus'] = True
+        else:
+            addret['menus'] = False
+
+        addret['menu'] = models.Menu.objects.filter(id=addret['menu']).first()
+        addret['parent'] = models.Permissions.objects.filter(id=addret['parent']).first()
+        models.Permissions.objects.filter(id=id).update(**addret)
+
+        return redirect('user:menulist')
+    print(request.session.get('menu_dict'))
+    print(request.session.get('permissions'))
+    return render(request, 'menu_permission/permissions_add_edit.html',
+                  {"header_info": header_info['edit'], "permissions_obj": permissions_obj})
+
+
+def permissiondel(request,id):
+    """
+    权限删除
+    :param request:
+    :return:
+    """
+    models.Permissions.objects.filter(id=id).delete()
+    return redirect('user:menulist')

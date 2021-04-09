@@ -344,6 +344,7 @@ class Permissions(models.Model):
     icon = models.CharField(max_length=60,verbose_name="图标",null=True,blank=True)
     menu = models.ForeignKey('Menu',blank=True,null=True)
     parent = models.ForeignKey('self',blank=True,null=True)
+    alias = models.CharField(verbose_name="url别名",max_length=32,null=True,blank=True)
 
     def __str__(self):
         return self.title

@@ -6,7 +6,7 @@
 
 {% block content %}
     <div>
-        <a href="{% url 'user:enrolladd' %}" class="add btn btn-success pull-left">添加</a>
+        <a href="{% url 'user:enrolladd' %}" class="add btn btn-success pull-left {{ request.session.permission_show.enrolladd|default:'hidden' }}">添加</a>
         <div class="row">
             <div class="col-lg-4 pull-right">
                 <form action="" method="get">
@@ -49,7 +49,7 @@
                     <th>报名日期</th>
                     <th>校区</th>
                     <th>所报班级</th>
-                    <th>操作</th>
+                    <th class="{{ request.session.permission_show.enrolledit|default:'hidden' }}">操作</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -61,8 +61,8 @@
                         <td>{{ enroll_obj.enrolled_date|date:"Y-m-d" }}</td>
                         <td>{{ enroll_obj.school.name}}</td>
                         <td>{{ enroll_obj.enrolment_class }}</td>
-                        <td>
-                            <a href="{% url 'user:enrolledit' enroll_obj.pk %}" class="glyphicon glyphicon-pencil"></a>
+                        <td class="{{ request.session.permission_show.enrolledit|default:'hidden' }}">
+                            <a href="{% url 'user:enrolledit' enroll_obj.pk %}" class="glyphicon glyphicon-pencil {{ request.session.permission_show.enrolledit|default:'hidden' }}"></a>
                         </td>
                     </tr>
                 {% endfor %}

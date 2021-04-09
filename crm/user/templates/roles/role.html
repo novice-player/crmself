@@ -1,0 +1,48 @@
+{% extends 'customer_page/starter.html' %}
+
+{% block header %}
+    <h1>角色管理</h1>
+{% endblock %}
+
+{% block content %}
+    <div>
+        <a href="{% url 'user:roleadd' %}" class="add btn btn-success pull-left {{ request.session.permission_show.roleadd|default:'hidden' }}">添加</a>
+        <form action="" method="post">
+            {% csrf_token %}
+            <table class="table table-bordered table-striped">
+                <thead>
+                <tr>
+                    <th>序号</th>
+                    <th>名称</th>
+                    <th class="{{ request.session.permission_show.roleedit|default:'hidden' }}">操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for roles in roles_obj %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ roles.name }}</td>
+                        <td class="{{ request.session.permission_show.enrolledit|default:'hidden' }}">
+                            <a href="{% url 'user:roleedit' roles.pk %}" class="glyphicon glyphicon-pencil pull-left {{ request.session.permission_show.roleedit|default:'hidden' }}"></a>
+
+                            <a href="{% url 'user:roledel' roles.pk %}" class="glyphicon glyphicon-trash pull-left {{ request.session.permission_show.roledel|default:'hidden' }}"></a>
+                        </td>
+                    </tr>
+                {% endfor %}
+
+                </tbody>
+            </table>
+        </form>
+        <nav aria-label="Page navigation">
+            <ul class="pagination">
+                {{ page_html|safe }}
+            </ul>
+        </nav>
+    </div>
+
+
+{% endblock %}
+
+{% block script %}
+
+{% endblock %}

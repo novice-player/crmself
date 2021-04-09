@@ -6,7 +6,7 @@
 
 {% block content %}
     <div>
-        <a href="{% url 'user:followupadd' %}" class="add btn btn-success pull-left">添加</a>
+        <a href="{% url 'user:followupadd' %}" class="add btn btn-success pull-left {{ request.session.permission_show.followupadd|default:'hidden' }}">添加</a>
         <div class="row">
             <div class="col-lg-4 pull-right">
                 <form action="" method="get">
@@ -49,7 +49,7 @@
                     <th>跟进状态</th>
                     <th>跟进人</th>
                     <th>跟进日期</th>
-                    <th>操作</th>
+                    <th class="{{ request.session.permission_show.followupedit|default:'hidden' }}">操作</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -62,8 +62,8 @@
                         <td>{{ record.get_status_display }}</td>
                         <td>{{ record.consultant.username }}</td>
                         <td>{{ record.date|date:"Y-m-d" }}</td>
-                        <td>
-                            <a href="{% url 'user:followupedit' record.id %}" class="glyphicon glyphicon-pencil"></a>
+                        <td class="{{ request.session.permission_show.followupedit|default:'hidden' }}">
+                            <a href="{% url 'user:followupedit' record.id %}" class="glyphicon glyphicon-pencil {{ request.session.permission_show.followupedit|default:'hidden' }}"></a>
                         </td>
                     </tr>
                 {% endfor %}

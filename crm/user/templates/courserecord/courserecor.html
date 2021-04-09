@@ -6,7 +6,7 @@
 
 {% block content %}
     <div>
-        <a href="{% url 'user:courserecordadd' %}" class="add btn btn-success pull-left">添加</a>
+        <a href="{% url 'user:courserecordadd' %}" class="add btn btn-success pull-left {{ request.session.permission_show.courserecordadd|default:'hidden' }}">添加</a>
         <div class="row">
             <div class="col-lg-4 pull-right">
                 <form action="" method="get">
@@ -50,7 +50,7 @@
                     <th>班级</th>
                     <th>讲师</th>
                     <th>学习记录</th>
-                    <th>操作</th>
+                    <th class="{{ request.session.permission_show.courserecordedit|default:'hidden' }}">操作</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -63,8 +63,8 @@
                         <td>{{ coursere.re_class}}</td>
                         <td>{{ coursere.teacher.username }}</td>
                         <td><a href="{% url 'user:studyrecord' %}?coursere_id={{ coursere.pk }}">记录详情</a></td>
-                        <td>
-                            <a href="{% url 'user:courserecordedit' coursere.pk %}" class="glyphicon glyphicon-pencil"></a>
+                        <td class="{{ request.session.permission_show.courserecordedit|default:'hidden' }}">
+                            <a href="{% url 'user:courserecordedit' coursere.pk %}" class="glyphicon glyphicon-pencil {{ request.session.permission_show.courserecordedit|default:'hidden' }}"></a>
                         </td>
                     </tr>
                 {% endfor %}

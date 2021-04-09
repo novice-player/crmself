@@ -265,24 +265,24 @@ desired effect
                 <!-- Optionally, you can add icons to the links -->
                 {% for menu_k,menu_v in request.session.menu_dict.items %}
                     <li class="treeview">
-                        <a href="#"><i class="fa fa-link"></i> <span>{{ menu_v.title }}</span>
+                        <a href="#"><i class="{{ menu_v.icon }}"></i> <span>{{ menu_v.title }}</span>
                             <span class="pull-right-container">
                                 <i class="fa fa-angle-left pull-right"></i>
                             </span>
                         </a>
                         <ul class="treeview-menu" style="{{ menu_v.style_msg|default:'display: none' }}">
                             {% for foo in menu_v.childen %}
-                                <li class="{{ foo.class_msg }}"><a  href="{{ foo.url }}">{{ foo.title }}</a></li>
+                                <li class="{{ foo.class_msg }}"><a href="{{ foo.url }}">{{ foo.title }}</a></li>
                             {% endfor %}
                         </ul>
                     </li>
                 {% endfor %}
 
-{#                <li><a href="{% url 'user:customer' %}"><i class="fa fa-link"></i> <span>公有客户</span></a></li>#}
-{#                <li><a href="{% url 'user:mycustomer' %}"><i class="fa fa-link"></i> <span>我的客户</span></a></li>#}
-{#                <li><a href="{% url 'user:followuprecords' %}"><i class="fa fa-link"></i> <span>跟进记录</span></a></li>#}
-{#                <li><a href="{% url 'user:enrollment' %}"><i class="fa fa-link"></i> <span>报名记录</span></a></li>#}
-{#                <li><a href="{% url 'user:courserecord' %}"><i class="fa fa-link"></i> <span>课程记录</span></a></li>#}
+                {#                <li><a href="{% url 'user:customer' %}"><i class="fa fa-link"></i> <span>公有客户</span></a></li>#}
+                {#                <li><a href="{% url 'user:mycustomer' %}"><i class="fa fa-link"></i> <span>我的客户</span></a></li>#}
+                {#                <li><a href="{% url 'user:followuprecords' %}"><i class="fa fa-link"></i> <span>跟进记录</span></a></li>#}
+                {#                <li><a href="{% url 'user:enrollment' %}"><i class="fa fa-link"></i> <span>报名记录</span></a></li>#}
+                {#                <li><a href="{% url 'user:courserecord' %}"><i class="fa fa-link"></i> <span>课程记录</span></a></li>#}
                 {#                <li class="treeview">#}
                 {#                    <a href="#"><i class="fa fa-link"></i> <span>Multilevel</span>#}
                 {#                        <span class="pull-right-container">#}
@@ -308,8 +308,15 @@ desired effect
 
             {% endblock %}
             <ol class="breadcrumb">
-                <li><a href="#"><i class="fa fa-dashboard"></i> Level</a></li>
-                <li class="active">Here</li>
+                {#                <li><a href="#"><i class="fa fa-dashboard"></i> Level</a></li>#}
+                <li><a href="{% url 'user:home' %}">首页</a></li>
+                {% for foo in request.session.breadcrumb_msg %}
+                    {% if forloop.last %}
+                        <li class="active">{{ foo.title }}</li>
+                    {% else %}
+                        <li class="active"><a href="{{ foo.url }}">{{ foo.title }}</a></li>
+                    {% endif %}
+                {% endfor %}
             </ol>
         </section>
 

@@ -186,3 +186,63 @@ class StudyRecordFrom(forms.ModelForm):
         model = models.StudyRecord
         fields = '__all__'
 
+
+
+class RoleFrom(forms.ModelForm):
+    """
+    角色管理
+    """
+
+    class Meta:
+        model = models.Roles
+        fields = '__all__'
+        labels = {
+            'name':'名称',
+            'permissions':'权限'
+        }
+
+    def __init__(self, request, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field_name, field in self.fields.items():
+            field.widget.attrs.update({'class': 'form-control'})
+
+class MenuFrom(forms.ModelForm):
+    """
+    菜单管理
+    """
+
+    class Meta:
+        model = models.Menu
+        fields = '__all__'
+        labels = {
+            'title':'名称',
+            'icon':'图标',
+            'weight':'权重'
+        }
+
+    def __init__(self, request, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field_name, field in self.fields.items():
+            field.widget.attrs.update({'class': 'form-control'})
+
+
+class PermissionsForm(forms.ModelForm):
+    """
+    权限信息管理
+    """
+
+    class Meta:
+        model = models.Permissions
+        fields = '__all__'
+        widgets = {
+            'menus':forms.widgets.NullBooleanSelect(),
+            'parent':forms.widgets.SelectMultiple()
+        }
+
+    def __init__(self, request, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field_name, field in self.fields.items():
+            field.widget.attrs.update({'class': 'form-control'})
+
+
+

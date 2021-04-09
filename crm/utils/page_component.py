@@ -3,7 +3,7 @@ from django.utils.safestring import mark_safe
 
 class Paging:
 
-    def __init__(self,page_num,total_number,base_url="",number_each_page=3,max_page=3):
+    def __init__(self,page_num,total_number,base_url="",number_each_page=5,max_page=3):
         """
 
         :param page_num: 当前所在页码

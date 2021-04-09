@@ -1,0 +1,26 @@
+{% extends 'customer_page/starter.html' %}
+
+{% block header %}
+    <h1>{{ header_info }}</h1>
+{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-xs-8 col-xs-offset-2">
+            <form action="" method="post">
+                {% csrf_token %}
+                {% for menus in menus_obj %}
+                    <label for="{{ menus.id_for_label }}">{{ menus.label }}</label>
+                    {{ menus }}
+                {% endfor %}
+                <br>
+                <div class="pull-left">
+                    <button type="submit" class="btn btn-success">提交</button>
+                </div>
+            </form>
+
+        </div>
+
+    </div>
+
+{% endblock %}
